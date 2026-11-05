@@ -6,7 +6,7 @@ Dokumen ini diperbarui secara berkala (*live tracking*) untuk mencatat setiap ta
 ---
 
 ### 📌 Ringkasan Status Proyek
-* **Repositori Proyek:** `c:\Magang BRIN\Belajar_RAG\LightRAG_medis\`
+* **Repositori Proyek:** `c:\Magang BRIN\Belajar_RAG\LightRAG_medis\` | **GitHub:** [WinsenCoded/LightMedGraphRAG](https://github.com/WinsenCoded/LightMedGraphRAG)
 * **Target Arsitektur:** Hibrida LightRAG (Key-Value Vector Indexing + Dual-Level Retrieval) & MedGraphRAG (UMLS CUI Grounding + RxNorm Deterministic Safety)
 * **Status Keseluruhan:** 🟢 **Fase 2: Multi-Backend Cloud & Hugging Face Deployment (Selesai & Siap Publikasi)**
 * **Tanggal Pembaruan:** 4 November 2026
