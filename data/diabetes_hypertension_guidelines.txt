@@ -1,0 +1,17 @@
+PANDUAN KLINIS MANAJEMEN DIABETES MELITUS TIPE 2, HIPERTENSI, DAN MANAJEMEN NYERI
+==================================================================================
+
+1. Karakteristik Komorbiditas Kardiometabolik
+Diabetes Melitus Tipe 2 (Type 2 Diabetes Mellitus) dan Hipertensi Esensial (Hypertension) merupakan dua kondisi komorbid yang saling memperparah kerusakan mikrovaskular dan makrovaskular, khususnya pada organ ginjal (nefropati diabetik) dan retina (retinopati diabetik).
+
+2. Terapi Farmakologi Standar Lini Pertama
+- Untuk tatalaksana glikemik: Metformin adalah terapi lini pertama pilihan pada pasien diabetes melitus tipe 2 untuk menurunkan resistensi insulin dan produksi glukosa hepatik.
+- Untuk tatalaksana tekanan darah: Penghambat Enzim Konversi Angiotensin (ACE Inhibitors) seperti lisinopril atau Antagonis Reseptor Angiotensin II (ARB) seperti losartan merupakan obat pilihan utama karena memberikan efek nefroprotektif yang memperlambat progresi albuminuria.
+
+3. Peringatan Farmakologis dan Interaksi Obat dengan NSAID:
+Banyak pasien lanjut usia dengan diabetes dan hipertensi mengeluhkan nyeri sendi (osteoartritis). Sering kali pasien mengonsumsi obat antiinflamasi nonsteroid (NSAID) yang dijual bebas, seperti ibuprofen, diklofenak, atau naproksen.
+
+Kombinasi lisinopril (ACE inhibitor) bersama ibuprofen (NSAID) memiliki risiko nefrotoksisitas akut yang sangat tinggi ("Triple Whammy" jika digabung dengan diuretik). NSAID menghambat sintesis prostaglandin renal yang memicu vasokonstriksi arteriol aferen ginjal, sementara ACE inhibitor (lisinopril) mendilatasi arteriol eferen. Akibatnya terjadi penurunan drastis laju filtrasi glomerulus (GFR), memicu cedera ginjal akut (Acute Kidney Injury) dan hiperkalemia berat. Selain itu, ibuprofen menahan retensi natrium dan air yang meniadakan efek antihipertensi dari lisinopril. 
+
+Untuk manajemen nyeri yang aman pada pasien diabetes dan hipertensi yang mengonsumsi lisinopril, parasetamol (asetaminofen) merupakan analgesik pilihan pertama yang tidak mengganggu hemodinamik ginjal.
+

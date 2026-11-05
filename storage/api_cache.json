@@ -1,0 +1,94 @@
+{
+  "umls:search:heart failure:None:2": [
+    {
+      "cui": "C0018801",
+      "name": "Heart failure",
+      "rootSource": "MTH",
+      "uri": "https://uts-ws.nlm.nih.gov/rest/content/2026AB/CUI/C0018801"
+    },
+    {
+      "cui": "C0018802",
+      "name": "Congestive heart failure",
+      "rootSource": "MTH",
+      "uri": "https://uts-ws.nlm.nih.gov/rest/content/2026AB/CUI/C0018802"
+    }
+  ],
+  "umls:def:C0018801": [
+    {
+      "source": "MSHCZE",
+      "value": "Stav, kdy srdce není schopno plnit svou funkci (tj. přečerpávat, \"\"pumpovat\"\" krev) v množství přiměřeném nárokům organismu. K příčinám se řadí porucha myokardu (zejm. ischemie), objemové a tlakové přetěžování srdce (např. chlopenní vady, hypertenze). Nikoliv vzácné je s. oboustranné s kombinací příznaků. S. s. může být akutní nebo chronické s různě dramatickými příznaky a s různě zapojenými kompenzačními mechanismy. K nim patří zejm. zvyšování preloadu (dilatace komory), retence tekutin a solí v důsledku silné aktivace systému renin-angiotenzin-aldosteron, tachykardie a aktivace sympatoadrenálního systému (vazokonstrikce). S. s. je považováno za systémový stav se změnami nejen hemodynamickými, ale změnami v hormonální a cytokinové produkci, ve vnitřním prostředí apod. Některé změny se vyvíjejí rychle (např. tachykardie), jiné po delší dobu (retence tekutin), rozvoj některých trvá i měsíce (hypertrofie a strukturální změny myokardu). Kompenzační mechanismy samy o sobě mohou z dlouhodobého hlediska srdce poškozovat (tachykardie zvyšuje potřebu kyslíku, zhoršuje prokrvení, vazokonstrikce vede k zvýšení afterloadu atp.). Patofyziologicky se rozlišuje selhání backward, forward. Na nedostatečnosti se podílí systolická dysfunkce (špatná kontraktilní schopnost) i dysfunkce diastolická (snížená poddajnost komory v diastole se vzestupem enddiastolického tlaku). Důležitá je rovněž správná životospráva, omezení solení, dostatek fyzického i psychického odpočinku. (cit. Velký lékařský slovník online, 2017 http://lekarske.slovniky.cz)"
+    },
+    {
+      "source": "MSHNOR",
+      "value": "En uensartet tilstand hvor hjertet ikke er i stand til å pumpe tilstrekkelig blod til å tilfredsstille kroppens krav. Hjertesvikt kan skyldes strukturelle defekter, funksjonelle abnormiteter (ventrikulær dysfunksjon) eller en plutselig påkjenning som overstiger hjertets kapasitet. Kronisk hjertesvikt er mer vanlig enn akutt hjertesvikt som skyldes plutselig skade av hjertets funksjon, slik som ved hjerteinfarkt."
+    },
+    {
+      "source": "CSP",
+      "value": "inability of the heart to pump blood at an adequate rate to fill tissue metabolic requirements or the ability to do so only at an elevated filling pressure."
+    }
+  ],
+  "rxnorm:rxcui:metoprolol": "6918",
+  "rxnorm:rxcui:salbutamol": "435",
+  "umls:search:sesak napas akut (dyspnea):None:1": [],
+  "umls:search:ortopnea:None:1": [
+    {
+      "cui": "C0085619",
+      "name": "Orthopnea",
+      "rootSource": "MTH",
+      "uri": "https://uts-ws.nlm.nih.gov/rest/content/2026AB/CUI/C0085619"
+    }
+  ],
+  "umls:def:C0085619": [
+    {
+      "source": "HPO",
+      "value": "A sensation of breathlessness in the recumbent position, relieved by sitting or standing. [HPO_CONTRIBUTOR:UToronto_htrang]"
+    },
+    {
+      "source": "MSH",
+      "value": "Breathlessness in the recumbent position."
+    },
+    {
+      "source": "NCI",
+      "value": "Shortness of breath while lying down and which is relived by sitting or standing."
+    }
+  ],
+  "umls:search:batuk kronik:None:1": [],
+  "umls:search:penurunan toleransi aktivitas:None:1": [],
+  "umls:search:kelelahan:None:1": [],
+  "umls:search:penyakit paru obstruktif kronik (ppok):None:1": [],
+  "umls:search:gagal jantung kongestif:None:1": [],
+  "umls:search:otot polos bronkus:None:1": [],
+  "umls:search:miokardium:None:1": [
+    {
+      "cui": "C2717907",
+      "name": "Isolated Noncompaction of the Ventricular Myocardium",
+      "rootSource": "MSH",
+      "uri": "https://uts-ws.nlm.nih.gov/rest/content/2026AB/CUI/C2717907"
+    }
+  ],
+  "umls:def:C2717907": [
+    {
+      "source": "MSHSPA",
+      "value": "Raras miocardiopatías congénitas caracterizadas por la ausencia de compactación del miocardio ventricular izquierdo. La no compactación resulta en numerosas y prominentes trabeculaciones y pérdida de malla miocárdica (miocardio esponjoso) en el VENTRÍCULO IZQUIERDO. Características clínicas heterogéneas incluyen disminución de la función sistólica a veces asociada con dilatación ventricular izquierda, que se presenta ya sea neonatal o progresivamente. A menudo, el VENTRÍCULO DERECHO también es afectado. INSUFICIENCIA CARDÍACA CONGESTIVA; EMBOLIA PULMONAR; y ARRITMIA ventricular se ven comúnmente."
+    },
+    {
+      "source": "MSH",
+      "value": "Rare congenital cardiomyopathies characterized by the lack of left ventricular myocardium compaction. The noncompaction results in numerous prominent trabeculations and a loose myocardial meshwork (spongy myocardium) in the LEFT VENTRICLE. Heterogeneous clinical features include diminished systolic function sometimes associated with left ventricular dilation, that presents either neonatally or progressively. Often, the RIGHT VENTRICLE is also affected. CONGESTIVE HEART FAILURE; PULMONARY EMBOLISM; and ventricular ARRHYTHMIA are commonly seen."
+    },
+    {
+      "source": "MSHCZE",
+      "value": "Vzácné vrozené kardiomyopatie charakterizované nekompaktním myokardem komor. Typická je prominující trabekularizace svaloviny a volná síť propletených trabekul myokardu levé komory. Mezi heterogenní klinické příznaky patří systolická dysfunkce, která je někdy doprovázená dilatací levé komory (neonatální nebo progresivní). Často je postižena i pravá komora. Mezi obvyklé projevy patří městnavé srdeční selhání, plicní embolie a arytmie komor."
+    }
+  ],
+  "rxnorm:rxcui:salbutamol (albuterol)": null,
+  "rxnorm:approx:salbutamol (albuterol)": {
+    "rxcui": "435",
+    "name": "Albuterol",
+    "score": "12.07771110534668"
+  },
+  "rxnorm:rxcui:formoterol": "25255",
+  "rxnorm:rxcui:tiotropium": "69120",
+  "rxnorm:rxcui:bisoprolol": "19484",
+  "rxnorm:rxcui:carvedilol": "20352",
+  "rxnorm:rxcui:ipratropium": "7213"
+}

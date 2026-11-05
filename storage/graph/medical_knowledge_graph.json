@@ -1,0 +1,167 @@
+{
+  "directed": true,
+  "multigraph": false,
+  "graph": {},
+  "nodes": [
+    {
+      "standard_name": "sesak napas akut (dyspnea)",
+      "code": "N/A",
+      "code_system": "LOCAL",
+      "entity_type": "symptoms",
+      "definition": "Clinical entity extracted from text: sesak napas akut (dyspnea)",
+      "id": "LOCAL:sesak_napas_akut_(dyspnea)"
+    },
+    {
+      "standard_name": "Orthopnea",
+      "code": "C0085619",
+      "code_system": "UMLS",
+      "entity_type": "symptoms",
+      "definition": "A sensation of breathlessness in the recumbent position, relieved by sitting or standing. [HPO_CONTRIBUTOR:UToronto_htrang]",
+      "id": "CUI:C0085619"
+    },
+    {
+      "standard_name": "batuk kronik",
+      "code": "N/A",
+      "code_system": "LOCAL",
+      "entity_type": "symptoms",
+      "definition": "Clinical entity extracted from text: batuk kronik",
+      "id": "LOCAL:batuk_kronik"
+    },
+    {
+      "standard_name": "penurunan toleransi aktivitas",
+      "code": "N/A",
+      "code_system": "LOCAL",
+      "entity_type": "symptoms",
+      "definition": "Clinical entity extracted from text: penurunan toleransi aktivitas",
+      "id": "LOCAL:penurunan_toleransi_aktivitas"
+    },
+    {
+      "standard_name": "kelelahan",
+      "code": "N/A",
+      "code_system": "LOCAL",
+      "entity_type": "symptoms",
+      "definition": "Clinical entity extracted from text: kelelahan",
+      "id": "LOCAL:kelelahan"
+    },
+    {
+      "standard_name": "Penyakit Paru Obstruktif Kronik (PPOK)",
+      "code": "N/A",
+      "code_system": "LOCAL",
+      "entity_type": "diseases",
+      "definition": "Clinical entity extracted from text: Penyakit Paru Obstruktif Kronik (PPOK)",
+      "id": "LOCAL:penyakit_paru_obstruktif_kronik_(ppok)"
+    },
+    {
+      "standard_name": "Gagal Jantung Kongestif",
+      "code": "N/A",
+      "code_system": "LOCAL",
+      "entity_type": "diseases",
+      "definition": "Clinical entity extracted from text: Gagal Jantung Kongestif",
+      "id": "LOCAL:gagal_jantung_kongestif"
+    },
+    {
+      "standard_name": "otot polos bronkus",
+      "code": "N/A",
+      "code_system": "LOCAL",
+      "entity_type": "anatomy",
+      "definition": "Clinical entity extracted from text: otot polos bronkus",
+      "id": "LOCAL:otot_polos_bronkus"
+    },
+    {
+      "standard_name": "Isolated Noncompaction of the Ventricular Myocardium",
+      "code": "C2717907",
+      "code_system": "UMLS",
+      "entity_type": "anatomy",
+      "definition": "Raras miocardiopatías congénitas caracterizadas por la ausencia de compactación del miocardio ventricular izquierdo. La no compactación resulta en numerosas y prominentes trabeculaciones y pérdida de malla miocárdica (miocardio esponjoso) en el VENTRÍCULO IZQUIERDO. Características clínicas heterogéneas incluyen disminución de la función sistólica a veces asociada con dilatación ventricular izquierda, que se presenta ya sea neonatal o progresivamente. A menudo, el VENTRÍCULO DERECHO también es afectado. INSUFICIENCIA CARDÍACA CONGESTIVA; EMBOLIA PULMONAR; y ARRITMIA ventricular se ven comúnmente.",
+      "id": "CUI:C2717907"
+    },
+    {
+      "standard_name": "Albuterol",
+      "code": "435",
+      "code_system": "RxNorm",
+      "entity_type": "T4_Medication",
+      "definition": "RxNorm Standard Medication Concept (Albuterol)",
+      "id": "RXCUI:435"
+    },
+    {
+      "standard_name": "formoterol",
+      "code": "25255",
+      "code_system": "RxNorm",
+      "entity_type": "T4_Medication",
+      "definition": "RxNorm Standard Medication Concept (formoterol)",
+      "id": "RXCUI:25255"
+    },
+    {
+      "standard_name": "tiotropium",
+      "code": "69120",
+      "code_system": "RxNorm",
+      "entity_type": "T4_Medication",
+      "definition": "RxNorm Standard Medication Concept (tiotropium)",
+      "id": "RXCUI:69120"
+    },
+    {
+      "standard_name": "metoprolol",
+      "code": "6918",
+      "code_system": "RxNorm",
+      "entity_type": "T4_Medication",
+      "definition": "RxNorm Standard Medication Concept (metoprolol)",
+      "id": "RXCUI:6918"
+    },
+    {
+      "standard_name": "bisoprolol",
+      "code": "19484",
+      "code_system": "RxNorm",
+      "entity_type": "T4_Medication",
+      "definition": "RxNorm Standard Medication Concept (bisoprolol)",
+      "id": "RXCUI:19484"
+    },
+    {
+      "standard_name": "carvedilol",
+      "code": "20352",
+      "code_system": "RxNorm",
+      "entity_type": "T4_Medication",
+      "definition": "RxNorm Standard Medication Concept (carvedilol)",
+      "id": "RXCUI:20352"
+    },
+    {
+      "standard_name": "ipratropium",
+      "code": "7213",
+      "code_system": "RxNorm",
+      "entity_type": "T4_Medication",
+      "definition": "RxNorm Standard Medication Concept (ipratropium)",
+      "id": "RXCUI:7213"
+    }
+  ],
+  "links": [
+    {
+      "relation": "komorbiditas",
+      "mechanism": "sering terjadi bersamaan",
+      "source": "LOCAL:penyakit_paru_obstruktif_kronik_(ppok)",
+      "target": "LOCAL:gagal_jantung_kongestif"
+    },
+    {
+      "relation": "kontraindikasi",
+      "mechanism": "memicu bronkospasme akut dan gagal napas",
+      "source": "RXCUI:435",
+      "target": "RXCUI:6918"
+    },
+    {
+      "relation": "kontraefektif",
+      "mechanism": "antagonis efek terapeutik bronkodilator beta-2 agonis",
+      "source": "RXCUI:6918",
+      "target": "RXCUI:435"
+    },
+    {
+      "relation": "alternatif",
+      "mechanism": "tidak berinteraksi langsung dengan reseptor beta",
+      "source": "RXCUI:6918",
+      "target": "RXCUI:69120"
+    },
+    {
+      "relation": "tatalaksana",
+      "mechanism": "menurunkan mortalitas dan beban kerja miokardium",
+      "source": "RXCUI:19484",
+      "target": "LOCAL:gagal_jantung_kongestif"
+    }
+  ]
+}

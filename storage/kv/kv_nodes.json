@@ -1,0 +1,146 @@
+{
+  "LOCAL:sesak_napas_akut_(dyspnea)": {
+    "standard_name": "sesak napas akut (dyspnea)",
+    "code_system": "LOCAL",
+    "code": "N/A",
+    "type": "symptoms",
+    "definition": "Clinical entity extracted from text: sesak napas akut (dyspnea)",
+    "source_doc": "copd_heart_failure_guidelines.txt",
+    "raw_mention": "sesak napas akut (dyspnea)"
+  },
+  "CUI:C0085619": {
+    "standard_name": "Orthopnea",
+    "code_system": "UMLS",
+    "code": "C0085619",
+    "type": "symptoms",
+    "definition": "A sensation of breathlessness in the recumbent position, relieved by sitting or standing. [HPO_CONTRIBUTOR:UToronto_htrang]",
+    "source_doc": "copd_heart_failure_guidelines.txt",
+    "raw_mention": "ortopnea"
+  },
+  "LOCAL:batuk_kronik": {
+    "standard_name": "batuk kronik",
+    "code_system": "LOCAL",
+    "code": "N/A",
+    "type": "symptoms",
+    "definition": "Clinical entity extracted from text: batuk kronik",
+    "source_doc": "copd_heart_failure_guidelines.txt",
+    "raw_mention": "batuk kronik"
+  },
+  "LOCAL:penurunan_toleransi_aktivitas": {
+    "standard_name": "penurunan toleransi aktivitas",
+    "code_system": "LOCAL",
+    "code": "N/A",
+    "type": "symptoms",
+    "definition": "Clinical entity extracted from text: penurunan toleransi aktivitas",
+    "source_doc": "copd_heart_failure_guidelines.txt",
+    "raw_mention": "penurunan toleransi aktivitas"
+  },
+  "LOCAL:kelelahan": {
+    "standard_name": "kelelahan",
+    "code_system": "LOCAL",
+    "code": "N/A",
+    "type": "symptoms",
+    "definition": "Clinical entity extracted from text: kelelahan",
+    "source_doc": "copd_heart_failure_guidelines.txt",
+    "raw_mention": "kelelahan"
+  },
+  "LOCAL:penyakit_paru_obstruktif_kronik_(ppok)": {
+    "standard_name": "Penyakit Paru Obstruktif Kronik (PPOK)",
+    "code_system": "LOCAL",
+    "code": "N/A",
+    "type": "diseases",
+    "definition": "Clinical entity extracted from text: Penyakit Paru Obstruktif Kronik (PPOK)",
+    "source_doc": "copd_heart_failure_guidelines.txt",
+    "raw_mention": "Penyakit Paru Obstruktif Kronik (PPOK)"
+  },
+  "LOCAL:gagal_jantung_kongestif": {
+    "standard_name": "Gagal Jantung Kongestif",
+    "code_system": "LOCAL",
+    "code": "N/A",
+    "type": "diseases",
+    "definition": "Clinical entity extracted from text: Gagal Jantung Kongestif",
+    "source_doc": "copd_heart_failure_guidelines.txt",
+    "raw_mention": "Gagal Jantung Kongestif"
+  },
+  "LOCAL:otot_polos_bronkus": {
+    "standard_name": "otot polos bronkus",
+    "code_system": "LOCAL",
+    "code": "N/A",
+    "type": "anatomy",
+    "definition": "Clinical entity extracted from text: otot polos bronkus",
+    "source_doc": "copd_heart_failure_guidelines.txt",
+    "raw_mention": "otot polos bronkus"
+  },
+  "CUI:C2717907": {
+    "standard_name": "Isolated Noncompaction of the Ventricular Myocardium",
+    "code_system": "UMLS",
+    "code": "C2717907",
+    "type": "anatomy",
+    "definition": "Raras miocardiopatías congénitas caracterizadas por la ausencia de compactación del miocardio ventricular izquierdo. La no compactación resulta en numerosas y prominentes trabeculaciones y pérdida de malla miocárdica (miocardio esponjoso) en el VENTRÍCULO IZQUIERDO. Características clínicas heterogéneas incluyen disminución de la función sistólica a veces asociada con dilatación ventricular izquierda, que se presenta ya sea neonatal o progresivamente. A menudo, el VENTRÍCULO DERECHO también es afectado. INSUFICIENCIA CARDÍACA CONGESTIVA; EMBOLIA PULMONAR; y ARRITMIA ventricular se ven comúnmente.",
+    "source_doc": "copd_heart_failure_guidelines.txt",
+    "raw_mention": "miokardium"
+  },
+  "RXCUI:435": {
+    "standard_name": "Albuterol",
+    "code_system": "RxNorm",
+    "code": "435",
+    "type": "T4_Medication",
+    "definition": "RxNorm Standard Medication Concept (Albuterol)",
+    "source_doc": "copd_heart_failure_guidelines.txt",
+    "raw_mention": "salbutamol (albuterol)"
+  },
+  "RXCUI:25255": {
+    "standard_name": "formoterol",
+    "code_system": "RxNorm",
+    "code": "25255",
+    "type": "T4_Medication",
+    "definition": "RxNorm Standard Medication Concept (formoterol)",
+    "source_doc": "copd_heart_failure_guidelines.txt",
+    "raw_mention": "formoterol"
+  },
+  "RXCUI:69120": {
+    "standard_name": "tiotropium",
+    "code_system": "RxNorm",
+    "code": "69120",
+    "type": "T4_Medication",
+    "definition": "RxNorm Standard Medication Concept (tiotropium)",
+    "source_doc": "copd_heart_failure_guidelines.txt",
+    "raw_mention": "tiotropium"
+  },
+  "RXCUI:6918": {
+    "standard_name": "metoprolol",
+    "code_system": "RxNorm",
+    "code": "6918",
+    "type": "T4_Medication",
+    "definition": "RxNorm Standard Medication Concept (metoprolol)",
+    "source_doc": "copd_heart_failure_guidelines.txt",
+    "raw_mention": "metoprolol"
+  },
+  "RXCUI:19484": {
+    "standard_name": "bisoprolol",
+    "code_system": "RxNorm",
+    "code": "19484",
+    "type": "T4_Medication",
+    "definition": "RxNorm Standard Medication Concept (bisoprolol)",
+    "source_doc": "copd_heart_failure_guidelines.txt",
+    "raw_mention": "bisoprolol"
+  },
+  "RXCUI:20352": {
+    "standard_name": "carvedilol",
+    "code_system": "RxNorm",
+    "code": "20352",
+    "type": "T4_Medication",
+    "definition": "RxNorm Standard Medication Concept (carvedilol)",
+    "source_doc": "copd_heart_failure_guidelines.txt",
+    "raw_mention": "carvedilol"
+  },
+  "RXCUI:7213": {
+    "standard_name": "ipratropium",
+    "code_system": "RxNorm",
+    "code": "7213",
+    "type": "T4_Medication",
+    "definition": "RxNorm Standard Medication Concept (ipratropium)",
+    "source_doc": "copd_heart_failure_guidelines.txt",
+    "raw_mention": "ipratropium"
+  }
+}

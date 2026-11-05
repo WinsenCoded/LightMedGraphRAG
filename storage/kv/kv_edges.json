@@ -1,0 +1,83 @@
+{
+  "LOCAL:penyakit_paru_obstruktif_kronik_(ppok)->LOCAL:gagal_jantung_kongestif::often co-occur": {
+    "source": "Penyakit Paru Obstruktif Kronik (PPOK)",
+    "source_id": "LOCAL:penyakit_paru_obstruktif_kronik_(ppok)",
+    "target": "Gagal Jantung Kongestif",
+    "target_id": "LOCAL:gagal_jantung_kongestif",
+    "relation": "often co-occur",
+    "mechanism": "shared symptoms",
+    "evidence_snippet": "PEDOMAN KLINIS TATALAKSANA KOMORBIDITAS PPOK DAN GAGAL JANTUNG KRONIK ======================================================================== 1. Gambaran Klinis dan Patofisiologi Komorbiditas Penyakit Paru Obstruktif Kronik (PPOK / Chronic Obstructi..."
+  },
+  "RXCUI:435->RXCUI:6918::contraindicated_with": {
+    "source": "Albuterol",
+    "source_id": "RXCUI:435",
+    "target": "metoprolol",
+    "target_id": "RXCUI:6918",
+    "relation": "contraindicated_with",
+    "mechanism": "bronkospasme akut and gagal napas",
+    "evidence_snippet": "PEDOMAN KLINIS TATALAKSANA KOMORBIDITAS PPOK DAN GAGAL JANTUNG KRONIK ======================================================================== 1. Gambaran Klinis dan Patofisiologi Komorbiditas Penyakit Paru Obstruktif Kronik (PPOK / Chronic Obstructi..."
+  },
+  "RXCUI:6918->RXCUI:435::antagonis": {
+    "source": "metoprolol",
+    "source_id": "RXCUI:6918",
+    "target": "Albuterol",
+    "target_id": "RXCUI:435",
+    "relation": "antagonis",
+    "mechanism": "directly opposes bronchodilator effect",
+    "evidence_snippet": "PEDOMAN KLINIS TATALAKSANA KOMORBIDITAS PPOK DAN GAGAL JANTUNG KRONIK ======================================================================== 1. Gambaran Klinis dan Patofisiologi Komorbiditas Penyakit Paru Obstruktif Kronik (PPOK / Chronic Obstructi..."
+  },
+  "RXCUI:6918->RXCUI:69120::alternative": {
+    "source": "metoprolol",
+    "source_id": "RXCUI:6918",
+    "target": "tiotropium",
+    "target_id": "RXCUI:69120",
+    "relation": "alternative",
+    "mechanism": "non-adrenergic and non-interacting with beta-receptors",
+    "evidence_snippet": "PEDOMAN KLINIS TATALAKSANA KOMORBIDITAS PPOK DAN GAGAL JANTUNG KRONIK ======================================================================== 1. Gambaran Klinis dan Patofisiologi Komorbiditas Penyakit Paru Obstruktif Kronik (PPOK / Chronic Obstructi..."
+  },
+  "LOCAL:penyakit_paru_obstruktif_kronik_(ppok)->LOCAL:gagal_jantung_kongestif::komorbiditas": {
+    "source": "Penyakit Paru Obstruktif Kronik (PPOK)",
+    "source_id": "LOCAL:penyakit_paru_obstruktif_kronik_(ppok)",
+    "target": "Gagal Jantung Kongestif",
+    "target_id": "LOCAL:gagal_jantung_kongestif",
+    "relation": "komorbiditas",
+    "mechanism": "sering terjadi bersamaan",
+    "evidence_snippet": "PEDOMAN KLINIS TATALAKSANA KOMORBIDITAS PPOK DAN GAGAL JANTUNG KRONIK ======================================================================== 1. Gambaran Klinis dan Patofisiologi Komorbiditas Penyakit Paru Obstruktif Kronik (PPOK / Chronic Obstructi..."
+  },
+  "RXCUI:435->RXCUI:6918::kontraindikasi": {
+    "source": "Albuterol",
+    "source_id": "RXCUI:435",
+    "target": "metoprolol",
+    "target_id": "RXCUI:6918",
+    "relation": "kontraindikasi",
+    "mechanism": "memicu bronkospasme akut dan gagal napas",
+    "evidence_snippet": "PEDOMAN KLINIS TATALAKSANA KOMORBIDITAS PPOK DAN GAGAL JANTUNG KRONIK ======================================================================== 1. Gambaran Klinis dan Patofisiologi Komorbiditas Penyakit Paru Obstruktif Kronik (PPOK / Chronic Obstructi..."
+  },
+  "RXCUI:6918->RXCUI:435::kontraefektif": {
+    "source": "metoprolol",
+    "source_id": "RXCUI:6918",
+    "target": "Albuterol",
+    "target_id": "RXCUI:435",
+    "relation": "kontraefektif",
+    "mechanism": "antagonis efek terapeutik bronkodilator beta-2 agonis",
+    "evidence_snippet": "PEDOMAN KLINIS TATALAKSANA KOMORBIDITAS PPOK DAN GAGAL JANTUNG KRONIK ======================================================================== 1. Gambaran Klinis dan Patofisiologi Komorbiditas Penyakit Paru Obstruktif Kronik (PPOK / Chronic Obstructi..."
+  },
+  "RXCUI:6918->RXCUI:69120::alternatif": {
+    "source": "metoprolol",
+    "source_id": "RXCUI:6918",
+    "target": "tiotropium",
+    "target_id": "RXCUI:69120",
+    "relation": "alternatif",
+    "mechanism": "tidak berinteraksi langsung dengan reseptor beta",
+    "evidence_snippet": "PEDOMAN KLINIS TATALAKSANA KOMORBIDITAS PPOK DAN GAGAL JANTUNG KRONIK ======================================================================== 1. Gambaran Klinis dan Patofisiologi Komorbiditas Penyakit Paru Obstruktif Kronik (PPOK / Chronic Obstructi..."
+  },
+  "RXCUI:19484->LOCAL:gagal_jantung_kongestif::tatalaksana": {
+    "source": "bisoprolol",
+    "source_id": "RXCUI:19484",
+    "target": "Gagal Jantung Kongestif",
+    "target_id": "LOCAL:gagal_jantung_kongestif",
+    "relation": "tatalaksana",
+    "mechanism": "menurunkan mortalitas dan beban kerja miokardium",
+    "evidence_snippet": "PEDOMAN KLINIS TATALAKSANA KOMORBIDITAS PPOK DAN GAGAL JANTUNG KRONIK ======================================================================== 1. Gambaran Klinis dan Patofisiologi Komorbiditas Penyakit Paru Obstruktif Kronik (PPOK / Chronic Obstructi..."
+  }
+}
