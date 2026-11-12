@@ -21,4 +21,5 @@ env/
 .vscode/
 .idea/
 *.swp
+.gradio/
 
