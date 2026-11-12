@@ -23,3 +23,17 @@ env/
 *.swp
 .gradio/
 
+# Presentation & Slide Materials
+*.pptx
+*.ppt
+generate_pptx.py
+PRESENTATION_SLIDES.md
+
+# Workspace Internal Tracking & Planning Docs
+LIVE_TRACKER.md
+LIGHTMEDGRAPHRAG_PLAN.md
+
+# Runtime Cache & Logs
+storage/api_cache.json
+storage/logs/
+
