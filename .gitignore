@@ -28,6 +28,7 @@ env/
 *.ppt
 generate_pptx.py
 PRESENTATION_SLIDES.md
+PRESENTATION_SCRIPT.md
 
 # Workspace Internal Tracking & Planning Docs
 LIVE_TRACKER.md
