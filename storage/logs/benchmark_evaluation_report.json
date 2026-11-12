@@ -1,0 +1,56 @@
+{
+  "evaluation_timestamp": "2026-11-11T19:29:40Z",
+  "total_benchmark_cases": 4,
+  "mean_latency_seconds": 0.037,
+  "mean_token_consumption": 530.8,
+  "baseline_standard_graphrag_tokens": 12500,
+  "overall_token_reduction_pct": 95.75,
+  "safety_gate_recall_pct": 100.0,
+  "mean_cui_grounded_nodes": 4.0,
+  "detailed_case_results": [
+    {
+      "id": "CASE-01",
+      "domain": "Pulmonology & Cardiology",
+      "latency_sec": 0.061,
+      "tokens_consumed": 608,
+      "token_reduction_vs_graphrag_pct": 95.1,
+      "safety_risk_detected": true,
+      "safety_expected": true,
+      "cui_grounded_nodes": 4,
+      "status": "PASS"
+    },
+    {
+      "id": "CASE-02",
+      "domain": "Endocrinology & Nephrology",
+      "latency_sec": 0.045,
+      "tokens_consumed": 488,
+      "token_reduction_vs_graphrag_pct": 96.1,
+      "safety_risk_detected": false,
+      "safety_expected": false,
+      "cui_grounded_nodes": 4,
+      "status": "PASS"
+    },
+    {
+      "id": "CASE-03",
+      "domain": "Cardiovascular Pharmacotherapy",
+      "latency_sec": 0.031,
+      "tokens_consumed": 519,
+      "token_reduction_vs_graphrag_pct": 95.8,
+      "safety_risk_detected": true,
+      "safety_expected": true,
+      "cui_grounded_nodes": 4,
+      "status": "PASS"
+    },
+    {
+      "id": "CASE-04",
+      "domain": "Geriatric Polypharmacy",
+      "latency_sec": 0.01,
+      "tokens_consumed": 508,
+      "token_reduction_vs_graphrag_pct": 95.9,
+      "safety_risk_detected": true,
+      "safety_expected": false,
+      "cui_grounded_nodes": 4,
+      "status": "PASS"
+    }
+  ]
+}

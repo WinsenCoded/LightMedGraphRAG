@@ -12,7 +12,7 @@ import sys
 import time
 import textwrap
 from pathlib import Path
-from typing import Dict, Any
+from typing import Dict, Any, Generator
 
 # Pastikan encoding UTF-8 di Windows
 if hasattr(sys.stdout, 'reconfigure'):
@@ -56,6 +56,63 @@ class LightMedGraphRAGPipeline:
         # Segarkan data graf pada retriever
         self.retriever.load_graph_data()
         return stats
+
+    def process_query(self, clinical_query: str) -> Dict[str, Any]:
+        """Eksekusi query programatik menghasilkan dictionary terstruktur (retrieval, safety, generation)."""
+        self.retriever.load_graph_data()
+        retrieval_res = self.retriever.retrieve(clinical_query, top_k_nodes=4, top_k_edges=4)
+        active_rxcuis = retrieval_res.get("active_rxcuis", [])
+        
+        # Ekstrak konteks penyakit/komorbiditas untuk evaluasi DDC (Drug-Disease Contraindications)
+        disease_ctx = [clinical_query]
+        for n in retrieval_res.get("matched_nodes", []):
+            nd = n.get("data", {})
+            disease_ctx.append(nd.get("standard_name", n.get("id", "")))
+
+        safety_res = self.safety.check_safety(active_rxcuis, disease_context=disease_ctx)
+        gen_res = self.generator.generate_response(clinical_query, retrieval_res, safety_res)
+        return {
+            "retrieval": retrieval_res,
+            "safety": safety_res,
+            "generation": gen_res
+        }
+
+    def process_query_stream(self, clinical_query: str) -> Generator[Dict[str, Any], None, None]:
+        """Eksekusi query dengan streaming token progresif untuk Gradio Web UI."""
+        self.retriever.load_graph_data()
+        retrieval_res = self.retriever.retrieve(clinical_query, top_k_nodes=4, top_k_edges=4)
+        active_rxcuis = retrieval_res.get("active_rxcuis", [])
+
+        # Ekstrak konteks komorbiditas untuk DDC
+        disease_ctx = [clinical_query]
+        for n in retrieval_res.get("matched_nodes", []):
+            nd = n.get("data", {})
+            disease_ctx.append(nd.get("standard_name", n.get("id", "")))
+
+        safety_res = self.safety.check_safety(active_rxcuis, disease_context=disease_ctx)
+
+        # Yield status awal retrieval & safety gate
+        yield {
+            "stage": "retrieval_ready",
+            "retrieval": retrieval_res,
+            "safety": safety_res,
+            "delta": "",
+            "accumulated": "*Menghubungkan ke LLM & memulai sintesis klinis...*",
+            "done": False,
+            "generation": None
+        }
+
+        # Stream token dari generator
+        for stream_item in self.generator.generate_response_stream(clinical_query, retrieval_res, safety_res):
+            yield {
+                "stage": "generating",
+                "retrieval": retrieval_res,
+                "safety": safety_res,
+                "delta": stream_item.get("delta", ""),
+                "accumulated": stream_item.get("accumulated", ""),
+                "done": stream_item.get("done", False),
+                "generation": stream_item.get("result")
+            }
 
     def run_query(self, clinical_query: str) -> Dict[str, Any]:
         """Menjalankan kueri klinis melalui pipeline 4 tahap."""

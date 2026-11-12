@@ -14,7 +14,7 @@ import os
 import time
 import json
 import re
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Generator
 from dataclasses import dataclass
 import requests
 
@@ -72,6 +72,16 @@ class BaseLLMProvider:
     ) -> LLMResponse:
         raise NotImplementedError
 
+    def generate_stream(
+        self,
+        prompt: str,
+        system_prompt: str = "",
+        temperature: float = 0.2,
+        max_tokens: int = 1024
+    ) -> Generator[Dict[str, Any], None, None]:
+        """Streaming generator yielding {"delta": str, "accumulated": str, "done": bool, "response": Optional[LLMResponse]}."""
+        raise NotImplementedError
+
 
 class OllamaProvider(BaseLLMProvider):
     """Provider untuk LLM lokal via REST API Ollama."""
@@ -127,6 +137,79 @@ class OllamaProvider(BaseLLMProvider):
         except Exception as e:
             latency = time.time() - t0
             return LLMResponse(text=f"[Ollama Connection Error]: {str(e)}", latency_sec=round(latency, 3), provider="Ollama", model=self.model_name)
+
+    def generate_stream(
+        self,
+        prompt: str,
+        system_prompt: str = "",
+        temperature: float = 0.2,
+        max_tokens: int = 1024
+    ) -> Generator[Dict[str, Any], None, None]:
+        payload = {
+            "model": self.model_name,
+            "prompt": prompt,
+            "stream": True,
+            "options": {
+                "temperature": temperature,
+                "num_predict": max_tokens
+            }
+        }
+        if system_prompt:
+            payload["system"] = system_prompt
+
+        t0 = time.time()
+        accumulated = []
+        prompt_eval_count = estimate_tokens(prompt + system_prompt)
+        eval_count = 0
+
+        try:
+            r = requests.post(self.generate_url, json=payload, stream=True, timeout=LLM_TIMEOUT)
+            if r.status_code == 200:
+                for line in r.iter_lines():
+                    if not line:
+                        continue
+                    try:
+                        chunk_json = json.loads(line.decode("utf-8"))
+                        delta = chunk_json.get("response", "")
+                        if delta:
+                            accumulated.append(delta)
+                            yield {
+                                "delta": delta,
+                                "accumulated": "".join(accumulated),
+                                "done": False,
+                                "response": None
+                            }
+                        if chunk_json.get("done", False):
+                            prompt_eval_count = chunk_json.get("prompt_eval_count", prompt_eval_count)
+                            eval_count = chunk_json.get("eval_count", estimate_tokens("".join(accumulated)))
+                    except Exception:
+                        continue
+            else:
+                err_text = f"[Ollama Error {r.status_code}]: {r.text}"
+                yield {"delta": err_text, "accumulated": err_text, "done": True, "response": LLMResponse(text=err_text, provider="Ollama", model=self.model_name)}
+                return
+        except Exception as e:
+            err_text = f"[Ollama Connection Error]: {str(e)}"
+            yield {"delta": err_text, "accumulated": err_text, "done": True, "response": LLMResponse(text=err_text, provider="Ollama", model=self.model_name)}
+            return
+
+        latency = time.time() - t0
+        full_text = "".join(accumulated).strip()
+        resp = LLMResponse(
+            text=full_text,
+            prompt_tokens=prompt_eval_count,
+            completion_tokens=eval_count,
+            total_tokens=prompt_eval_count + eval_count,
+            latency_sec=round(latency, 3),
+            provider="Ollama (Localhost)",
+            model=self.model_name
+        )
+        yield {
+            "delta": "",
+            "accumulated": full_text,
+            "done": True,
+            "response": resp
+        }
 
 
 class HuggingFaceInferenceProvider(BaseLLMProvider):
@@ -233,6 +316,60 @@ class HuggingFaceInferenceProvider(BaseLLMProvider):
                     model=self.model_name
                 )
 
+    def generate_stream(
+        self,
+        prompt: str,
+        system_prompt: str = "",
+        temperature: float = 0.2,
+        max_tokens: int = 1024
+    ) -> Generator[Dict[str, Any], None, None]:
+        t0 = time.time()
+        try:
+            from huggingface_hub import InferenceClient
+            client = InferenceClient(model=self.model_name, token=self.token if self.token else None)
+            messages = []
+            if system_prompt:
+                messages.append({"role": "system", "content": system_prompt})
+            messages.append({"role": "user", "content": prompt})
+
+            accumulated = []
+            for chunk in client.chat_completion(messages=messages, max_tokens=max_tokens, temperature=temperature, stream=True):
+                delta = chunk.choices[0].delta.content or ""
+                if delta:
+                    accumulated.append(delta)
+                    yield {
+                        "delta": delta,
+                        "accumulated": "".join(accumulated),
+                        "done": False,
+                        "response": None
+                    }
+            latency = time.time() - t0
+            full_text = "".join(accumulated).strip()
+            p_tok = estimate_tokens(prompt + system_prompt)
+            c_tok = estimate_tokens(full_text)
+            yield {
+                "delta": "",
+                "accumulated": full_text,
+                "done": True,
+                "response": LLMResponse(
+                    text=full_text,
+                    prompt_tokens=p_tok,
+                    completion_tokens=c_tok,
+                    total_tokens=p_tok + c_tok,
+                    latency_sec=round(latency, 3),
+                    provider="Hugging Face Inference API",
+                    model=self.model_name
+                )
+            }
+        except Exception:
+            resp = self.generate(prompt, system_prompt, temperature, max_tokens)
+            yield {
+                "delta": resp.text,
+                "accumulated": resp.text,
+                "done": True,
+                "response": resp
+            }
+
 
 class OpenAICompatibleProvider(BaseLLMProvider):
     """
@@ -314,6 +451,86 @@ class OpenAICompatibleProvider(BaseLLMProvider):
                 model=self.model_name
             )
 
+    def generate_stream(
+        self,
+        prompt: str,
+        system_prompt: str = "",
+        temperature: float = 0.2,
+        max_tokens: int = 1024
+    ) -> Generator[Dict[str, Any], None, None]:
+        url = f"{self.base_url}/chat/completions"
+        headers = {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json"
+        }
+        messages = []
+        if system_prompt:
+            messages.append({"role": "system", "content": system_prompt})
+        messages.append({"role": "user", "content": prompt})
+
+        payload = {
+            "model": self.model_name,
+            "messages": messages,
+            "temperature": temperature,
+            "max_tokens": max_tokens,
+            "stream": True
+        }
+
+        t0 = time.time()
+        accumulated = []
+        try:
+            r = requests.post(url, headers=headers, json=payload, stream=True, timeout=60)
+            if r.status_code == 200:
+                for line in r.iter_lines():
+                    if not line:
+                        continue
+                    line_str = line.decode("utf-8")
+                    if line_str.startswith("data: "):
+                        data_part = line_str[6:].strip()
+                        if data_part == "[DONE]":
+                            break
+                        try:
+                            chunk = json.loads(data_part)
+                            delta = chunk["choices"][0].get("delta", {}).get("content", "")
+                            if delta:
+                                accumulated.append(delta)
+                                yield {
+                                    "delta": delta,
+                                    "accumulated": "".join(accumulated),
+                                    "done": False,
+                                    "response": None
+                                }
+                        except Exception:
+                            continue
+            else:
+                err = f"[{self.provider_name} Error {r.status_code}]: {r.text}"
+                yield {"delta": err, "accumulated": err, "done": True, "response": LLMResponse(text=err, provider=self.provider_name, model=self.model_name)}
+                return
+        except Exception as e:
+            err = f"[{self.provider_name} Connection Error]: {str(e)}"
+            yield {"delta": err, "accumulated": err, "done": True, "response": LLMResponse(text=err, provider=self.provider_name, model=self.model_name)}
+            return
+
+        latency = time.time() - t0
+        full_text = "".join(accumulated).strip()
+        p_tok = estimate_tokens(prompt + system_prompt)
+        c_tok = estimate_tokens(full_text)
+        resp = LLMResponse(
+            text=full_text,
+            prompt_tokens=p_tok,
+            completion_tokens=c_tok,
+            total_tokens=p_tok + c_tok,
+            latency_sec=round(latency, 3),
+            provider=self.provider_name,
+            model=self.model_name
+        )
+        yield {
+            "delta": "",
+            "accumulated": full_text,
+            "done": True,
+            "response": resp
+        }
+
 
 class FallbackDeterministicProvider(BaseLLMProvider):
     """
@@ -378,6 +595,32 @@ class FallbackDeterministicProvider(BaseLLMProvider):
             provider="Deterministic Rule Fallback",
             model=self.model_name
         )
+
+    def generate_stream(
+        self,
+        prompt: str,
+        system_prompt: str = "",
+        temperature: float = 0.0,
+        max_tokens: int = 1024
+    ) -> Generator[Dict[str, Any], None, None]:
+        resp = self.generate(prompt, system_prompt, temperature, max_tokens, json_mode=False)
+        words = resp.text.split(" ")
+        accumulated = []
+        for i, w in enumerate(words):
+            word_with_space = w + (" " if i < len(words) - 1 else "")
+            accumulated.append(word_with_space)
+            yield {
+                "delta": word_with_space,
+                "accumulated": "".join(accumulated),
+                "done": False,
+                "response": None
+            }
+        yield {
+            "delta": "",
+            "accumulated": resp.text,
+            "done": True,
+            "response": resp
+        }
 
 
 def check_ollama_alive(url: str = OLLAMA_BASE_URL, timeout: float = 0.3) -> bool:

@@ -15,7 +15,7 @@ LightMedGraphRAG - Zero-Loss Context Assembler & Clinical Generator
 import json
 import time
 import logging
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Generator
 from pathlib import Path
 from config import (
     TEMPERATURE_GENERATION,
@@ -142,6 +142,76 @@ Provide a safe, evidence-grounded, and structured clinical response:"""
             self._log_audit_metrics(result)
 
         return result
+
+    def generate_response_stream(
+        self,
+        patient_query: str,
+        retrieval_result: Dict[str, Any],
+        safety_result: Dict[str, Any]
+    ) -> Generator[Dict[str, Any], None, None]:
+        """
+        Streaming generator respons klinis secara progresif.
+        Memungkinkan Time-to-First-Token (TTFT) < 1 detik di antarmuka web.
+        """
+        evidence_context = self.assemble_zero_loss_context(retrieval_result, safety_result)
+        
+        system_prompt = """You are a clinical decision support assistant operating on the LightMedGraphRAG architecture.
+Your core principles:
+1. Base your answer strictly on the validated medical evidence provided in the context.
+2. Explicitly cite UMLS CUI codes and RxNorm RxCUI codes when recommending or assessing diseases and drugs.
+3. If there are drug interaction warnings, you MUST highlight them prominently as a primary safety advisory.
+4. Structure your response clearly in clinical format:
+   - 1. Clinical Assessment (Tinjauan Klinis & Komorbiditas)
+   - 2. Therapeutic Recommendation (Rekomendasi Terapi & Alternatif Aman)
+   - 3. Safety Warnings (Peringatan Kontraindikasi & Interaksi Obat)
+   - 4. Traceable Medical Evidence (Daftar Kode CUI & RxCUI yang Menjadi Dasar Jawaban)
+5. Answer in the same language as the query (if Indonesian, answer in professional medical Indonesian)."""
+
+        user_prompt = f"""EVIDENCE CONTEXT:
+\"\"\"{evidence_context}\"\"\"
+
+CLINICAL QUERY / KASUS PASIEN:
+\"{patient_query}\"
+
+Provide a safe, evidence-grounded, and structured clinical response:"""
+
+        for stream_item in self.llm.generate_stream(
+            prompt=user_prompt,
+            system_prompt=system_prompt,
+            temperature=TEMPERATURE_GENERATION,
+            max_tokens=MAX_PREDICT_TOKENS
+        ):
+            if stream_item.get("done", False):
+                final_resp = stream_item.get("response")
+                result = {
+                    "query": patient_query,
+                    "evidence_context": evidence_context,
+                    "clinical_response": stream_item.get("accumulated", ""),
+                    "latency_seconds": getattr(final_resp, "latency_sec", 0.0),
+                    "prompt_tokens": getattr(final_resp, "prompt_tokens", 0),
+                    "completion_tokens": getattr(final_resp, "completion_tokens", 0),
+                    "total_tokens": getattr(final_resp, "total_tokens", 0),
+                    "provider": getattr(final_resp, "provider", "unknown"),
+                    "model": getattr(final_resp, "model", self.model_name),
+                    "status": "SUCCESS" if not stream_item.get("accumulated", "").startswith("[Error") else "ERROR"
+                }
+                if AUDIT_LOG_ENABLED:
+                    self._log_audit_metrics(result)
+                yield {
+                    "delta": "",
+                    "accumulated": stream_item.get("accumulated", ""),
+                    "done": True,
+                    "result": result,
+                    "evidence_context": evidence_context
+                }
+            else:
+                yield {
+                    "delta": stream_item.get("delta", ""),
+                    "accumulated": stream_item.get("accumulated", ""),
+                    "done": False,
+                    "result": None,
+                    "evidence_context": evidence_context
+                }
 
     def _log_audit_metrics(self, metric_data: Dict[str, Any]):
         """Menyimpan entri audit log ke berkas .jsonl."""

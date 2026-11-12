@@ -88,51 +88,53 @@ def run_clinical_query(
     provider_choice: str,
     user_api_key: str,
     custom_model: str
-) -> Tuple[str, str, str, str]:
-    """Menjalankan analisis klinis terpadu LightMedGraphRAG."""
+):
+    """Menjalankan analisis klinis terpadu LightMedGraphRAG secara streaming progresif."""
     if not query_text or not query_text.strip():
-        return (
+        yield (
             "⚠️ Masukkan kueri klinis atau pertanyaan pasien terlebih dahulu.",
             "", "", ""
         )
+        return
 
     # 1. Konfigurasi provider LLM dinamis
     provider = get_active_provider_instance(provider_choice, user_api_key, custom_model)
     pipeline.generator.llm = provider
     pipeline.generator.model_name = getattr(provider, "model_name", "custom")
 
-    # 2. Eksekusi Pipeline
-    t0 = time.time()
-    result = pipeline.process_query(query_text.strip())
-    retrieval_res = result["retrieval"]
-    safety_res = result["safety"]
-    gen_res = result["generation"]
-
-    # 3. Format Respons Klinis (Markdown)
-    clinical_resp_md = gen_res.get("clinical_response", "Tidak ada respons.")
-
-    # 4. Format Peringatan Keamanan & DDI
-    safety_warnings = safety_res.get("warnings", [])
-    rx_cuis = safety_res.get("analyzed_rxcuis", [])
+    # 2. Eksekusi Pipeline secara streaming progresif
+    safety_md = ""
+    retrieval_md = ""
     
-    if safety_warnings:
-        safety_md = "### 🚨 Peringatan Interaksi Obat & Kontraindikasi Mayor:\n\n"
-        for w in safety_warnings:
-            safety_md += f"- **[{w.get('severity', 'WARNING')}]** {w.get('description')}\n"
-    else:
-        safety_md = "### ✅ Tidak Terdeteksi Interaksi Mayor Antar-Zat Aktif\n\n"
-        safety_md += "Analisis farmakologis terhadap zat aktif pasien menunjukkan profil aman berdasarkan pedoman dan label FDA.\n"
-    
-    safety_md += f"\n*RxCUI Teranalisis: `{', '.join(rx_cuis) if rx_cuis else 'None'}`* | *Biaya Token LLM: **0 Token** (Deterministik)*"
+    for stream_update in pipeline.process_query_stream(query_text.strip()):
+        retrieval_res = stream_update.get("retrieval", {})
+        safety_res = stream_update.get("safety", {})
+        accumulated_text = stream_update.get("accumulated", "")
+        is_done = stream_update.get("done", False)
+        gen_res = stream_update.get("generation")
 
-    # 5. Format Detail Retrieval Dual-Level (LightRAG)
-    matched_nodes = retrieval_res.get("matched_nodes", [])
-    expanded_nodes = retrieval_res.get("expanded_nodes", [])
-    matched_edges = retrieval_res.get("matched_edges", [])
-    low_k = retrieval_res.get("keywords", {}).get("low_level_keywords", [])
-    high_k = retrieval_res.get("keywords", {}).get("high_level_keywords", [])
+        # Format Peringatan Keamanan & DDI jika belum terformat
+        if not safety_md:
+            safety_warnings = safety_res.get("warnings", [])
+            rx_cuis = safety_res.get("analyzed_rxcuis", [])
+            if safety_warnings:
+                safety_md = "### 🚨 Peringatan Interaksi Obat & Kontraindikasi Mayor:\n\n"
+                for w in safety_warnings:
+                    safety_md += f"- **[{w.get('severity', 'WARNING')}]** {w.get('description')}\n"
+            else:
+                safety_md = "### ✅ Tidak Terdeteksi Interaksi Mayor Antar-Zat Aktif\n\n"
+                safety_md += "Analisis farmakologis terhadap zat aktif pasien menunjukkan profil aman berdasarkan pedoman dan label FDA.\n"
+            safety_md += f"\n*RxCUI Teranalisis: `{', '.join(rx_cuis) if rx_cuis else 'None'}`* | *Biaya Token LLM: **0 Token** (Deterministik)*"
 
-    retrieval_md = f"""### 🔍 Analisis Pencarian Dual-Level (LightRAG Paradigm)
+        # Format Detail Retrieval Dual-Level jika belum terformat
+        if not retrieval_md:
+            matched_nodes = retrieval_res.get("matched_nodes", [])
+            expanded_nodes = retrieval_res.get("expanded_nodes", [])
+            matched_edges = retrieval_res.get("matched_edges", [])
+            low_k = retrieval_res.get("dual_keywords", {}).get("low_level_keywords", [])
+            high_k = retrieval_res.get("dual_keywords", {}).get("high_level_keywords", [])
+
+            retrieval_md = f"""### 🔍 Analisis Pencarian Dual-Level (LightRAG Paradigm)
 
 **1. Ekstraksi Kata Kunci (<100 Token):**
 - **Low-Level Keywords ($k^{{(l)}}$):** `{', '.join(low_k)}`
@@ -140,40 +142,47 @@ def run_clinical_query(
 
 **2. Node Entitas Cocok ({len(matched_nodes)}):**
 """
-    for n in matched_nodes[:6]:
-        cui_str = f"UMLS CUI: `{n.get('cui')}`" if n.get('cui') else "Local Grounding"
-        rxcui_str = f" | RxCUI: `{n.get('rxcui')}`" if n.get('rxcui') else ""
-        retrieval_md += f"- **{n.get('id')}** ({n.get('type')}) — {cui_str}{rxcui_str} *(Relevance: {n.get('score', 0):.3f})*\n"
+            for n in matched_nodes[:6]:
+                nd = n.get("data", {})
+                cui_str = f"UMLS CUI: `{nd.get('cui')}`" if nd.get('cui') else f"Code: `{nd.get('code', 'LOCAL')}`"
+                rxcui_str = f" | RxCUI: `{nd.get('rxcui')}`" if nd.get('rxcui') else ""
+                retrieval_md += f"- **{nd.get('standard_name', n.get('id'))}** ({nd.get('type', 'T1')}) — {cui_str}{rxcui_str} *(Relevance: {n.get('score', 0):.3f})*\n"
 
-    retrieval_md += f"\n**3. Ekspansi 1-Hop Subgraf ({len(expanded_nodes)} entitas tetangga ditarik):**\n"
-    for n in expanded_nodes[:4]:
-        retrieval_md += f"- ↳ *Tetangga Terkait:* **{n.get('id')}** ({n.get('type')}) via relasi `{n.get('via_relation')}` dari `{n.get('via_source')}`\n"
+            retrieval_md += f"\n**3. Ekspansi 1-Hop Subgraf ({len(expanded_nodes)} entitas tetangga ditarik):**\n"
+            for n in expanded_nodes[:4]:
+                nd = n.get("data", {})
+                retrieval_md += f"- ↳ *Tetangga Terkait:* **{nd.get('standard_name', n.get('id'))}** ({nd.get('type')}) via relasi `{n.get('via_relation')}` dari `{n.get('via_source')}`\n"
 
-    retrieval_md += f"\n**4. Edge Relasi Patofisiologi Cocok ({len(matched_edges)}):**\n"
-    for e in matched_edges[:4]:
-        retrieval_md += f"- `{e.get('source')}` ➔ `[{e.get('relation')}]` ➔ `{e.get('target')}`\n"
+            retrieval_md += f"\n**4. Edge Relasi Patofisiologi Cocok ({len(matched_edges)}):**\n"
+            for e in matched_edges[:4]:
+                ed = e.get("data", {})
+                retrieval_md += f"- `{ed.get('source', e.get('source'))}` ➔ `[{ed.get('relation', e.get('relation'))}]` ➔ `{ed.get('target', e.get('target'))}`\n"
 
-    # 6. Format Metrik Efisiensi & Audit
-    naive_graphrag_est = 12500  # Estimasi konsumsi token GraphRAG standar (komunitas global)
-    consumed_tokens = gen_res.get("total_tokens", 0)
-    saved_tokens = max(0, naive_graphrag_est - consumed_tokens)
-    efficiency_pct = (saved_tokens / naive_graphrag_est) * 100 if naive_graphrag_est > 0 else 0
+        if not is_done or not gen_res:
+            metrics_placeholder = "⏳ *Sedang mensintesis respons klinis terverifikasi (Streaming Real-Time)...*"
+            yield (accumulated_text, safety_md, retrieval_md, metrics_placeholder)
+        else:
+            # Selesai: Tampilkan audit token dan profil latensi lengkap
+            naive_graphrag_est = 12500
+            consumed_tokens = gen_res.get("total_tokens", 0)
+            saved_tokens = max(0, naive_graphrag_est - consumed_tokens)
+            efficiency_pct = (saved_tokens / naive_graphrag_est) * 100 if naive_graphrag_est > 0 else 0
 
-    metrics_md = f"""### 📊 Audit Efisiensi Token & Kinerja Riil
+            metrics_md = f"""### 📊 Audit Efisiensi Token & Kinerja Riil
 
 | Metrik Evaluasi | Nilai Tercatat | Catatan Ilmiah |
 | :--- | :--- | :--- |
 | **Backend Provider** | `{gen_res.get('provider', 'N/A')}` | Multi-backend engine |
-| **Model Digunakan** | `{gen_res.get('model', 'N/A')}` | Deterministic / LLM |
+| **Model Digunakan** | `{gen_res.get('model', 'N/A')}` | Real-time streaming |
 | **Latensi Respons** | **{gen_res.get('latency_seconds', 0)} detik** | End-to-end execution |
 | **Prompt Tokens** | {gen_res.get('prompt_tokens', 0)} tokens | Input + Zero-Loss context |
 | **Completion Tokens** | {gen_res.get('completion_tokens', 0)} tokens | Sintesis jawaban |
-| **Total Token Konsumsi** | **{consumed_tokens} tokens** | Sangat efisien |
+| **Total Token Konsumsi** | **{consumed_tokens} tokens** | Sangat hemat token |
 | **Estimasi Naive GraphRAG** | ~{naive_graphrag_est} tokens | Tanpa dual-level filtering |
 | **Penghematan Token** | **~{saved_tokens} tokens ({efficiency_pct:.1f}%)** | Validasi keunggulan LightRAG |
 | **Biaya Safety Gate** | **0 Token (100% Deterministik)** | NLM RxNorm safety module |
 """
-    return clinical_resp_md, safety_md, retrieval_md, metrics_md
+            yield (accumulated_text, safety_md, retrieval_md, metrics_md)
 
 
 def get_graph_data():

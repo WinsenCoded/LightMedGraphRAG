@@ -15,13 +15,14 @@ import numpy as np
 from typing import List, Dict, Any, Tuple
 from pathlib import Path
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.decomposition import TruncatedSVD
 from sklearn.metrics.pairwise import cosine_similarity
 from config import VECTOR_STORAGE_DIR
 
 logger = logging.getLogger("VectorStore")
 
 class LightweightVectorCollection:
-    """Koleksi vektor mandiri untuk Node atau Edge."""
+    """Koleksi vektor hibrida (Dense + Sparse) dengan Reciprocal Rank Fusion (RRF)."""
     
     def __init__(self, name: str, storage_dir: Path = VECTOR_STORAGE_DIR):
         self.name = name
@@ -36,6 +37,8 @@ class LightweightVectorCollection:
             lowercase=True
         )
         self.tfidf_matrix = None
+        self.dense_svd = None
+        self.dense_matrix = None
         self.is_fitted = False
         self.load()
 
@@ -52,42 +55,92 @@ class LightweightVectorCollection:
         self.is_fitted = False
 
     def build_index(self):
-        """Membangun matriks representasi vektor untuk pencarian."""
+        """Membangun representasi vektor ganda (Sparse TF-IDF & Dense LSA)."""
         if not self.doc_keys:
             self.tfidf_matrix = None
+            self.dense_svd = None
+            self.dense_matrix = None
             self.is_fitted = False
             return
         
+        # 1. Sparse TF-IDF representation
         self.tfidf_matrix = self.vectorizer.fit_transform(self.doc_keys)
+        
+        # 2. Dense Semantic LSA representation (TruncatedSVD)
+        n_samples, n_features = self.tfidf_matrix.shape
+        n_components = min(16, n_samples - 1, n_features - 1)
+        if n_components > 1:
+            try:
+                self.dense_svd = TruncatedSVD(n_components=n_components, random_state=42)
+                self.dense_matrix = self.dense_svd.fit_transform(self.tfidf_matrix)
+            except Exception as e:
+                logger.warning(f"Dense LSA index fallback: {e}")
+                self.dense_svd = None
+                self.dense_matrix = None
+        else:
+            self.dense_svd = None
+            self.dense_matrix = None
+
         self.is_fitted = True
 
     def search(self, query_text: str, top_k: int = 5) -> List[Tuple[str, float, Dict[str, Any]]]:
-        """Mencari dokumen berdasarkan kemiripan kosinus terhadap query.
+        """
+        Pencarian hibrida menggabungkan Sparse Lexical & Dense Semantic via Reciprocal Rank Fusion (RRF).
         
         Returns:
-            List of (doc_id, similarity_score, payload)
+            List of (doc_id, normalized_score, payload)
         """
         if not self.is_fitted or self.tfidf_matrix is None or len(self.doc_ids) == 0:
             self.build_index()
             if not self.is_fitted or self.tfidf_matrix is None:
                 return []
 
+        # 1. Jalur Sparse: TF-IDF Cosine Similarity
         query_vec = self.vectorizer.transform([query_text])
-        similarities = cosine_similarity(query_vec, self.tfidf_matrix).flatten()
-        
-        q_clean = query_text.lower().strip()
-        # Hybrid boost: jika ada kecocokan leksikal langsung
-        for idx, key in enumerate(self.doc_keys):
-            if q_clean and (q_clean in key.lower() or any(w in key.lower() for w in q_clean.split() if len(w) > 3)):
-                similarities[idx] = max(similarities[idx], 0.35) + 0.25
+        sparse_sims = cosine_similarity(query_vec, self.tfidf_matrix).flatten()
+        sparse_ranked = np.argsort(sparse_sims)[::-1]
+        sparse_rank_map = {idx: rank + 1 for rank, idx in enumerate(sparse_ranked)}
 
-        # Urutkan berdasarkan skor tertinggi
-        ranked_indices = np.argsort(similarities)[::-1]
+        # 2. Jalur Dense: Latent Semantic Space Cosine Similarity
+        dense_rank_map = {}
+        if self.dense_svd is not None and self.dense_matrix is not None:
+            try:
+                dense_query = self.dense_svd.transform(query_vec)
+                dense_sims = cosine_similarity(dense_query, self.dense_matrix).flatten()
+                dense_ranked = np.argsort(dense_sims)[::-1]
+                dense_rank_map = {idx: rank + 1 for rank, idx in enumerate(dense_ranked)}
+            except Exception:
+                dense_rank_map = {}
+
+        # 3. Reciprocal Rank Fusion (RRF)
+        rrf_constant = 60
+        fused_scores = np.zeros(len(self.doc_ids))
+        q_clean = query_text.lower().strip()
+        q_words = [w for w in q_clean.split() if len(w) > 3]
+
+        for idx, key in enumerate(self.doc_keys):
+            s_rank = sparse_rank_map.get(idx, len(self.doc_ids))
+            d_rank = dense_rank_map.get(idx, len(self.doc_ids)) if dense_rank_map else s_rank
+            rrf_score = (1.0 / (rrf_constant + s_rank)) + (1.0 / (rrf_constant + d_rank))
+
+            # Hybrid exact lexical match boost
+            k_lower = key.lower()
+            if q_clean in k_lower:
+                rrf_score += 0.025
+            elif any(w in k_lower for w in q_words):
+                rrf_score += 0.012
+
+            fused_scores[idx] = rrf_score
+
+        # Urutkan berdasarkan fused RRF score tertinggi
+        ranked_indices = np.argsort(fused_scores)[::-1]
         results = []
         for idx in ranked_indices[:top_k]:
-            score = float(similarities[idx])
-            if score > 0.05:  # Threshold relevansi minimal
-                results.append((self.doc_ids[idx], score, self.doc_payloads[idx]))
+            raw_score = float(fused_scores[idx])
+            # Normalisasi skor RRF ke interval [0.0, 1.0] untuk tampilan visual
+            normalized_score = min(1.0, round(raw_score * 32.0, 3))
+            if normalized_score > 0.05:
+                results.append((self.doc_ids[idx], normalized_score, self.doc_payloads[idx]))
         return results
 
     def save(self):

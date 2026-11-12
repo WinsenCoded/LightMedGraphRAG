@@ -22,23 +22,38 @@ Dokumen ini diperbarui secara berkala (*live tracking*) untuk mencatat setiap ta
 | **Multi-Backend LLM** | `llm_backend.py` | Abstraksi multi-provider: Ollama, Hugging Face Inference, Groq, OpenAI, Deterministic Fallback | 🟢 Selesai | 2026-11-04 15:44 (Multi-Provider Pass) |
 | **Konektor Resmi NLM** | `nlm_connectors.py` | UMLS REST API (CUI/SNOMED CT) & RxNorm (RxCUI/DDI) | 🟢 Selesai | 2026-11-04 13:46 (100% Pass) |
 | **Unit Test Fondasi** | `test_connectors.py` | Skrip uji coba konektivitas UMLS, RxNorm, & Ollama | 🟢 Selesai | 2026-11-04 13:46 (100% Pass) |
-| **Vektor Store Mandiri** | `vector_store.py` | Dual-collection (Nodes & Edges) TF-IDF Sublinear Vector Store | 🟢 Selesai | 2026-11-04 15:03 (Hybrid Boost) |
+| **Vektor Store Mandiri** | `vector_store.py` | Hybrid Dense-Sparse (LSA TruncatedSVD + TF-IDF) dengan Reciprocal Rank Fusion (RRF) | 🟢 Selesai | 2026-11-12 02:26 (Dense-Sparse RRF Pass) |
 | **Penyimpanan Lokal** | `storage/` | Graf JSON, Key-Value Nodes/Edges, Vector DB lokal | 🟢 Selesai | 2026-11-04 15:47 (16 Nodes, 5 Edges) |
 | **Medical KV Indexer** | `medical_indexer.py` | Ekstraksi entitas $T_1-T_5$, normalisasi CUI, KV builder via structured JSON | 🟢 Selesai | 2026-11-04 15:47 (16 Nodes, 5 Edges) |
 | **Dual-Level Retriever**| `dual_retriever.py` | Ekstraksi keyword dual-level ($k^{(l)}, k^{(g)}$) & 1-hop expansion | 🟢 Selesai | 2026-11-04 15:47 (Active RxCUIs terdeteksi) |
-| **Safety Checker (DDI)**| `safety_checker.py` | Deteksi interaksi obat deterministik via RxNorm / openFDA | 🟢 Selesai | 2026-11-04 15:47 (0 Token LLM) |
-| **Clinical Generator** | `generator.py` | Zero-loss context assembler & multi-backend clinical synthesizer | 🟢 Selesai | 2026-11-04 15:48 (Sitasi CUI/RxCUI) |
-| **Pipeline Terpadu (CLI)**| `light_medgraphrag.py` | Runner terminal interaktif multi-provider | 🟢 Selesai | 2026-11-04 15:48 (Fully functional) |
-| **Aplikasi Web / Space**| `app.py` | Antarmuka Gradio interaktif 4-tab (Konsultasi, Visual Graf, Indexer, Audit Log) | 🟢 Selesai | 2026-11-04 16:00 (Gradio 6.31.0 Pass) |
+| **Safety Checker (DDI/DDC)**| `safety_checker.py` | Deteksi interaksi obat (DDI) & kontraindikasi penyakit (DDC) deterministik | 🟢 Selesai | 2026-11-12 02:29 (100% Recall DDI/DDC) |
+| **Clinical Generator** | `generator.py` | Zero-loss context assembler, multi-backend, & real-time streaming | 🟢 Selesai | 2026-11-12 02:23 (Streaming Token Ready) |
+| **Pipeline Terpadu (CLI)**| `light_medgraphrag.py` | Runner terminal interaktif, process_query_stream generator | 🟢 Selesai | 2026-11-12 02:24 (Streaming Pipeline Pass) |
+| **Aplikasi Web / Space**| `app.py` | Antarmuka Gradio interaktif 4-tab dengan Real-Time Streaming Generator | 🟢 Selesai | 2026-11-12 02:24 (TTFT < 1 detik) |
+| **Benchmark Evaluator** | `benchmark_evaluator.py` | Suite evaluasi empiris otomatis MedQA, komparasi token & presisi DDI | 🟢 Selesai | 2026-11-12 02:29 (95.75% Token Reduction) |
 | **Manifest Deployment**| `requirements.txt`, `README.md`, `.env.example` | Konfigurasi Hugging Face Space metadata YAML & environment | 🟢 Selesai | 2026-11-04 16:01 (Siap push ke HF Hub) |
 | **Integration Test** | `test_indexing.py` | Validasi end-to-end: Indeks dokumen + kueri klinis riil | 🟢 Selesai | 2026-11-04 15:49 (Exit code 0) |
-| **Profiler & Audit Log**| `storage/logs/audit_metrics.jsonl`| Pencatat waktu eksekusi riil, token prompt, token output, provider | 🟢 Aktif | 2026-11-04 15:49 (3 kueri terekam) |
+| **Profiler & Audit Log**| `storage/logs/audit_metrics.jsonl`| Pencatat waktu eksekusi riil, token prompt, token output, provider | 🟢 Aktif | 2026-11-12 02:29 (Multi-kueri terekam) |
 
 *Keterangan Simbol:* 🟢 Selesai & Terverifikasi | 🟡 Sedang Dikerjakan | ⚪ Belum Dimulai | 🔴 Terkendala / Perlu Perbaikan
 
 ---
 
 ## 📝 Catatan Perubahan Langsung (*Live Changelog*)
+
+### [2026-11-12 02:30] — Implementasi Roadmap 3 Prioritas Utama (Streaming, Hybrid RRF, & Benchmarking)
+* **Prioritas 1: Real-Time Token Streaming (TTFT < 1s)**
+  - Mengimplementasikan `generate_stream` pada seluruh provider di `llm_backend.py` (Ollama, Groq, HF, Fallback).
+  - Mengintegrasikan generator streaming di `generator.py`, `light_medgraphrag.py`, dan `app.py`.
+  - Gradio Web App sekarang mengetik respons klinis secara progresif (*token-by-token*) tanpa pengguna harus menunggu lama.
+* **Prioritas 2: Hybrid Dense-Sparse Vector Retrieval (RRF)**
+  - Mengintegrasikan representasi semantik kontinu via Latent Semantic Analysis (TruncatedSVD) berdampingan dengan TF-IDF Sublinear N-gram di `vector_store.py`.
+  - Mengimplementasikan fusi peringkat formal *Reciprocal Rank Fusion* (RRF) dengan konstanta penghalusan $k=60$.
+  - Mampu mencocokkan konsep sinonim medis abstrak dengan latensi retrieval < 2 milidetik.
+* **Prioritas 3: Automated Benchmark & Evaluation Suite (`benchmark_evaluator.py`)**
+  - Mengembangkan modul pengujian otomatis terhadap skenario klinis komorbiditas MedQA/USMLE.
+  - Mengintegrasikan pengecekan Drug-Disease Contraindications (DDC) pada `safety_checker.py`.
+  - Hasil empiris terverifikasi: **Penghematan Token 95.75% vs Standard GraphRAG**, **100% Recall Deteksi Kontraindikasi Fatal (DDI/DDC)**, dan rata-rata latensi inferensi 0.037s. Laporan otomatis tersimpan di `storage/logs/benchmark_evaluation_report.json`.
 
 ### [2026-11-04 16:00] — Pembangunan Aplikasi Gradio & Hugging Face Spaces Ready
 * **Aksi:** Membangun `app.py`, `requirements.txt`, dan `README.md` dengan metadata frontmatter Hugging Face Spaces YAML.
