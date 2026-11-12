@@ -34,12 +34,28 @@ Dokumen ini diperbarui secara berkala (*live tracking*) untuk mencatat setiap ta
 | **Manifest Deployment**| `requirements.txt`, `README.md`, `.env.example` | Konfigurasi Hugging Face Space metadata YAML & environment | 🟢 Selesai | 2026-11-04 16:01 (Siap push ke HF Hub) |
 | **Integration Test** | `test_indexing.py` | Validasi end-to-end: Indeks dokumen + kueri klinis riil | 🟢 Selesai | 2026-11-04 15:49 (Exit code 0) |
 | **Profiler & Audit Log**| `storage/logs/audit_metrics.jsonl`| Pencatat waktu eksekusi riil, token prompt, token output, provider | 🟢 Aktif | 2026-11-12 02:29 (Multi-kueri terekam) |
+| **Bahan Presentasi Ilmiah**| `LightMedGraphRAG_Presentation.pptx` & `PRESENTATION_SLIDES.md` | Slide presentasi standar paper ilmiah (16:9 widescreen, 11 slide) | 🟢 Selesai | 2026-11-12 12:31 (Tersedia lokal & di GitHub) |
 
 *Keterangan Simbol:* 🟢 Selesai & Terverifikasi | 🟡 Sedang Dikerjakan | ⚪ Belum Dimulai | 🔴 Terkendala / Perlu Perbaikan
 
 ---
 
 ## 📝 Catatan Perubahan Langsung (*Live Changelog*)
+
+### [2026-11-12 12:35] — Penyusunan Slide Presentasi Format PPTX & Publikasi GitHub
+* **Aksi:** Membangun `generate_pptx.py` dan menghasilkan berkas presentasi resmi `LightMedGraphRAG_Presentation.pptx` (16:9 widescreen, 11 slide).
+* **Cakupan Slide:**
+  - Latar Belakang & Masalah Klinis (Token Cost vs Halusinasi Medis).
+  - Paradigma Hibrida: LightRAG (efisiensi) vs MedGraphRAG (keamanan/grounding).
+  - Arsitektur Sistem Hulu-ke-Hilir & Flowchart Eksekusi.
+  - Dual-Level Retrieval (Entitas & Komunitas Klinis).
+  - Grounding Ontologi CUI/RxCUI & Deterministic Safety Gate (100% recall DDI/DDC).
+  - Hasil Evaluasi Benchmark Empiris (Token reduction 95.75%, latensi <0.04s).
+  - Analisis Kasus Klinis Riil (Studi kasus Metoprolol pada pasien Asma/PPOK).
+  - Fitur Teknis: Real-Time Token Streaming (TTFT < 1s) & Multi-Backend LLM.
+  - Roadmap Riset Lanjutan (Future Work untuk produk final).
+  - Kesimpulan & Sesi Q&A.
+* **Publikasi:** Berkas slide dan skrip generator telah di-commit dan di-push ke GitHub repository `https://github.com/WinsenCoded/LightMedGraphRAG`.
 
 ### [2026-11-12 02:30] — Implementasi Roadmap 3 Prioritas Utama (Streaming, Hybrid RRF, & Benchmarking)
 * **Prioritas 1: Real-Time Token Streaming (TTFT < 1s)**
